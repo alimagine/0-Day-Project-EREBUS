@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>0-Day: Project EREBUS — Alimagine</title>
+<style>
+  :root{
+    --bg:#000000;
+    --text:#e8e8e8;
+    --accent:#ffd84d; /* terminal yellow */
+    --muted:#8a8a8a;
+    --glitch1:#ffd84d;
+    --glitch2:#ffffff;
+  }
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.45;
+  }
+  .container{max-width:980px;margin:0 auto;padding:32px;}
+
+  /* Hero / Terminal boot */
+  .hero{
+    padding:28px 18px;
+    border:1px solid rgba(255,255,255,0.03);
+    background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    box-shadow:0 8px 30px rgba(0,0,0,0.6);
+    border-radius:6px;
+    position:relative;
+    overflow:hidden;
+  }
+  .logo{max-width:120px;filter:grayscale(1);opacity:0.95}
+  h1{font-size:28px;margin:10px 0 6px;color:var(--text);letter-spacing:1px}
+  .meta{color:var(--muted);font-size:13px}
+  .tagline{color:var(--accent);font-size:16px;margin-top:10px;min-height:1.4em}
+
+  /* Typewriter console area */
+  .console{
+    margin-top:18px;padding:14px;background:#040406;border-radius:4px;border:1px solid rgba(255,255,255,0.03);text-align:left;
+    font-size:13px;color:var(--muted);min-height:120px;overflow:auto;white-space:pre-wrap;
+  }
+  .console .line{opacity:0.98}
+  .console .highlight{color:var(--accent)}
+
+  /* Buttons */
+  .ctas{margin-top:18px}
+  .btn{display:inline-block;padding:10px 16px;border-radius:4px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text);text-decoration:none;margin-right:8px;font-weight:600;font-size:13px}
+  .btn.primary{background:var(--accent);color:#0b0b0b;border-color:transparent;box-shadow:0 6px 20px rgba(255,216,77,0.08)}
+  .btn.ghost{border-color:rgba(255,216,77,0.12);color:var(--accent)}
+  .btn:hover{transform:translateY(-2px);transition:all .15s ease}
+
+  /* Sections */
+  section{margin-top:28px}
+  h2{font-size:18px;color:var(--text);margin-bottom:10px}
+  p.lead{color:var(--muted);font-size:14px}
+
+  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+  .card{background:#060607;border:1px solid rgba(255,255,255,0.03);padding:14px;border-radius:6px;font-size:13px}
+  .card b{color:var(--accent)}
+
+  .screenshot{width:100%;border-radius:4px;border:1px solid rgba(255,255,255,0.04);background:#070708;padding:8px;margin-top:10px}
+  .screenshot img{width:100%;display:block;border-radius:4px}
+
+  .devlog-list{margin-top:10px}
+  .devlog-item{background:#070708;border-left:4px solid rgba(255,216,77,0.06);padding:10px;margin-bottom:10px;border-radius:3px}
+  .devlog-item time{display:block;color:var(--muted);font-size:12px}
+
+  footer{margin-top:28px;padding:14px 0;color:var(--muted);font-size:13px;text-align:center}
+
+  /* Fade in */
+  .fade{opacity:0;transform:translateY(20px);transition:all .7s cubic-bezier(.2,.9,.2,1)}
+  .fade.show{opacity:1;transform:none}
+
+  /* Tagline glitch after typed */
+  .glitch{
+    display:inline-block;position:relative
+  }
+  .glitch::before,.glitch::after{
+    content:attr(data-text);position:absolute;left:0;top:0;opacity:0.8;mix-blend-mode:screen
+  }
+  .glitch::before{color:var(--glitch1);transform:translate(-2px, -1px);clip-path:polygon(0 0, 100% 0, 100% 33%, 0 33%)}
+  .glitch::after{color:var(--glitch2);transform:translate(2px, 1px);clip-path:polygon(0 66%,100% 66%,100% 100%,0 100%)}
+
+  /* Small responsive tweaks */
+  @media (max-width:640px){.container{padding:18px}.logo{max-width:90px}h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero fade" id="hero">
+    <!-- Logo: replace with your logo URL -->
+    <img src="YOUR_LOGO_URL" alt="Alimagine Logo" class="logo" />
+    <h1>0-DAY: PROJECT EREBUS</h1>
+    <div class="meta">Alimagine — Terminal Interactive Narrative</div>
+    <div class="tagline" id="tagline"></div>
+
+    <div class="console" id="console">
+      <div class="line highlight">[BOOT SEQUENCE: EREBUS :: initializing…]</div>
+      <div class="line">SYSTEM: checking subsystem integrity...</div>
+      <div class="line">NETWORK: secure channel closed</div>
+      <div class="line">LOG: awaiting operator authentication</div>
+    </div>
+
+    <div class="ctas">
+      <a class="btn primary" id="download-btn" href="YOUR_ITCH_DEMO_OR_DOWNLOAD_LINK" target="_blank">Download Demo (Windows)</a>
+      <a class="btn ghost" id="wishlist-btn" href="YOUR_ITCH_WISHLIST_LINK" target="_blank">Wishlist / Follow</a>
+      <a class="btn" id="linux-btn" href="YOUR_LINUX_LINK_IF_ANY" target="_blank">Linux Build (soon)</a>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="fade" id="about">
+    <h2>About the Project</h2>
+    <p class="lead">Declassified excerpt — Project EREBUS is a one-time interactive terminal experience. You are the operator: a system technician assigned to a failing launch facility. The system is old, the logs are corrupt, and the orders are absolute. Operate the terminal. Configure weapons. Decide who lives. There are no resets.</p>
+    <div class="features">
+      <div class="card"><b>Platform</b>: Windows, Linux (native builds)</div>
+      <div class="card"><b>Engine</b>: Godot 4.x (prototyping)</div>
+      <div class="card"><b>Session</b>: Single-run (30–90 minutes)</div>
+      <div class="card"><b>Endings</b>: 3 — choices are permanent</div>
+    </div>
+  </section>
+
+  <!-- FEATURES / TECH -->
+  <section class="fade" id="features">
+    <h2>Key Features</h2>
+    <div class="card">
+      <ul>
+        <li><b>Realistic Terminal Ops</b> — Interact with an authentic-feeling control terminal; sequence components, match serials, and troubleshoot live systems.</li>
+        <li><b>Audio-as-Data</b> — Ambient mechanical cues, log transmissions, and layered sound serve as gameplay clues.</li>
+        <li><b>No Reset Philosophy</b> — Your choices alter the permanent state. The game treats every playthrough as consequential.</li>
+        <li><b>Three Distinct Endings</b> — Each ending reflects your operational ethics.</li>
+        <li><b>Short, Dense Sessions</b> — Designed to deliver high emotional impact in limited time.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- STORY -->
+  <section class="fade" id="story">
+    <h2>Story Premise</h2>
+    <p class="lead">Year: 2134. Deep beneath the frozen northern plate, a command facility controls converging weapon systems designed for absolute deterrence. The facility’s systems are failing. Corruption in logs begins to read like memory. You have one account, one session, one set of keys. Orders arrive. Some are obvious. Others are not. The machine will ask you to decide who the target is — you will not always be told what you hit.</p>
+
+    <div class="card" style="margin-top:12px">
+      <b>Short log:</b>
+      <pre style="margin:8px 0;color:var(--muted);font-size:13px">[OPERATORAUTH: B-3T4] // session start
+> 04:12:02 :: launch_queue: 03 slots available
+> 04:12:17 :: incoming_packet: "confirm target: Sector X-3" (signature: THALVARIS)
+> 04:12:41 :: system advisory: "acknowledge civilian casualties: [YES] / [NO]"
+</pre>
+    </div>
+  </section>
+
+  <!-- MEDIA / SCREENSHOTS -->
+  <section class="fade" id="media">
+    <h2>Screenshots & Concept</h2>
+    <div class="screenshot">
+      <!-- Replace placeholder image with actual screenshot -->
+      <img src="GAME_SCREENSHOT_01_URL" alt="Terminal screenshot — corrupted log">
+      <div style="color:var(--muted);font-size:12px;margin-top:6px">Terminal view — corrupted log entry. Yellow highlights are active tokens.</div>
+    </div>
+    <div class="screenshot">
+      <img src="GAME_SCREENSHOT_02_URL" alt="Operator room mock ASCII">
+      <div style="color:var(--muted);font-size:12px;margin-top:6px">Operator HUD — ASCII art & system overlays.</div>
+    </div>
+  </section>
+
+  <!-- GAMEPLAY -->
+  <section class="fade" id="gameplay">
+    <h2>Gameplay</h2>
+    <p class="lead">Inspect files, configure weapon components, run diagnostics, and choose confirmations under pressure. The core loop: <b>Inspect → Configure → Confirm → Observe</b>. Some puzzle solves require cross-referencing logs with audio cues; others force you to choose under moral stress. There's no save/reload mechanic — every choice persists.</p>
+
+    <div class="features" style="margin-top:12px">
+      <div class="card"><b>Puzzle types</b>: sequence matching, timing windows, logic diagnostics.</div>
+      <div class="card"><b>Interface</b>: terminal commands, point-&-click panels, quick troubleshooting minigames.</div>
+      <div class="card"><b>Audio</b>: environmental hums, distant impact reports, encrypted voice logs.</div>
+    </div>
+  </section>
+
+  <!-- DEVLOG -->
+  <section class="fade" id="devlog">
+    <h2>Devlog</h2>
+    <div class="devlog-list">
+      <div class="devlog-item">
+        <strong>Aug 24, 2025 — Prototype Complete</strong>
+        <time>Prototype: core terminal loop playable; basic weapon sequencing implemented.</time>
+        <div style="color:var(--muted);margin-top:6px">Notes: targeting UI refined; audio layering added. Seeking focused testers for mechanical clarity.</div>
+      </div>
+
+      <div class="devlog-item">
+        <strong>Aug 18, 2025 — Art & UI Update</strong>
+        <time>Updated terminal palette to dark + yellow highlights; added ASCII-based environmental imagery.</time>
+        <div style="color:var(--muted);margin-top:6px">Notes: visual language locked for demo release.</div>
+      </div>
+
+      <div class="devlog-item">
+        <strong>Jul 30, 2025 — Design: Permanent Choices</strong>
+        <time>Committed to one-time play philosophy; implemented persistent end-state flags for branching endings.</time>
+        <div style="color:var(--muted);margin-top:6px">Notes: players will receive a reset only after the campaign completes in release builds.</div>
+      </div>
+    </div>
+    <div style="margin-top:12px"><a class="btn ghost" href="DEVLOG_LINK" target="_blank">Read full devlog</a></div>
+  </section>
+
+  <!-- SYSTEM / FAQ -->
+  <section class="fade" id="system">
+    <h2>System & FAQ</h2>
+    <div class="card">
+      <b>Minimum (Windows / Linux)</b>
+      <ul>
+        <li>OS: Windows 10+ / Ubuntu 20.04+</li>
+        <li>CPU: Dual-core 2.0 GHz</li>
+        <li>RAM: 4 GB</li>
+        <li>Storage: 500 MB</li>
+        <li>GPU: Integrated graphics supported</li>
+      </ul>
+      <b>Recommended</b>
+      <ul>
+        <li>CPU: Quad-core</li>
+        <li>RAM: 8 GB</li>
+        <li>SSD preferred</li>
+      </ul>
+    </div>
+
+    <div class="card" style="margin-top:10px">
+      <b>FAQ</b>
+      <ul>
+        <li><b>Is there a demo?</b> — Demo planned for release; link will be available here and on itch.io.</li>
+        <li><b>How long is one playthrough?</b> — 30–90 minutes depending on exploration.</li>
+        <li><b>Are choices permanent?</b> — Yes. The game is designed as a single-run experience. Post-campaign reset will be provided for players after the campaign completes.</li>
+        <li><b>Content warning?</b> — Contains themes of war, biological and psychological harm. Discretion advised.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PRESSKIT / CONTACT -->
+  <section class="fade" id="press">
+    <h2>Press & Assets</h2>
+    <p class="lead">Press kit available: key art, logo (transparent PNG), screenshots, and a 30s teaser. For press inquiries: <a href="mailto:press@alimagine.studio">press@alimagine.studio</a></p>
+    <div class="features" style="margin-top:12px">
+      <div class="card">alimg_logo_bw.png (512px+)</div>
+      <div class="card">erebus_keyart.jpg (1920×1080)</div>
+      <div class="card">erebus_teaser_30s.mp4</div>
+    </div>
+  </section>
+
+  <footer class="fade">
+    <div>© 2025 Alimagine — Alternative Imagination Engine</div>
+    <div style="margin-top:6px;color:var(--muted)">Follow: <a href="YOUR_INSTAGRAM" target="_blank" style="color:var(--accent)">Instagram</a> • <a href="YOUR_TWITTER" target="_blank" style="color:var(--accent)">X</a> • <a href="YOUR_REDDIT" target="_blank" style="color:var(--accent)">Reddit</a></div>
+  </footer>
+</div>
+
+<script>
+// Intro typed lines for console and tagline behavior
+const consoleEl = document.getElementById('console');
+const taglineEl = document.getElementById('tagline');
+const hero = document.getElementById('hero');
+
+const bootLines = [
+  '[BOOT SEQUENCE: EREBUS :: initializing...]',
+  'SECURITY: integrity check... OK',
+  'STORAGE: corrupted sectors detected',
+  'NETWORK: isolated — manual uplink required',
+  'LOGS: 12 unread critical entries',
+  'AUTH: operator token required'
+];
+
+let idx = 0;
+function typeLine(text, speed=18){
+  return new Promise(resolve => {
+    const span = document.createElement('div');
+    span.className = 'line';
+    consoleEl.appendChild(span);
+    let i=0;
+    function step(){
+      span.textContent += text.charAt(i);
+      i++;
+      if(i<text.length) setTimeout(step, speed);
+      else resolve(span);
+    }
+    step();
+  });
+}
+
+async function bootSequence(){
+  for(const line of bootLines){
+    await typeLine(line, 14);
+    await new Promise(r=>setTimeout(r,180));
+  }
+  await new Promise(r=>setTimeout(r,250));
+  // tagline typing
+  await taglineType('The last command you will ever give.');
+  // reveal hero
+  hero.classList.add('show');
+}
+
+function taglineType(text){
+  return new Promise(resolve=>{
+    let i=0;
+    function tick(){
+      taglineEl.textContent = text.slice(0,i);
+      i++;
+      if(i<=text.length){
+        setTimeout(tick,60);
+      } else {
+        // add glitch wrapper
+        taglineEl.innerHTML = `<span class=\"glitch\" data-text=\"${text}\">${text}</span>`;
+        resolve();
+      }
+    }
+    tick();
+  });
+}
+
+// run boot
+bootSequence();
+
+// Fade in sections on scroll
+const faders = document.querySelectorAll('.fade');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add('show');
+  });
+},{threshold:0.12});
+faders.forEach(f=>io.observe(f));
+
+// Small safety: disable download button if placeholder
+const dl = document.getElementById('download-btn');
+if(dl.href.includes('YOUR_ITCH')) dl.addEventListener('click', (e)=>{ e.preventDefault(); alert('Demo not uploaded yet — will be available at release.'); });
+
+</script>
+</body>
+</html>
